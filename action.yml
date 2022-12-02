@@ -1,22 +1,31 @@
-name: 'github_action_template'
-description: ''
+name: 'action_calaulcate_expiry'
+description: 'takes branch and expiry tijes and returns uniqe branch naem and expiry'
 author: 'Paul Kelleher'
 inputs:
-  input1:
+  branch_name:
     description: ""
-    required: false
-  input2:
+    required: true
+    default: "main"
+  expiry:
     description:  ""
-    required: false
+    required: true
+    default: 1
     
 outputs:
-  outpu1: 
+  expiry: 
     description: ""
-    value: ${{ steps.vars.outputs.OUTPUT1 }}
-  outpu2: 
+    value: ${{ steps.vars.outputs.EXPIRY }}
+  uuid: 
     description: ""
-    value: ${{ steps.vars.outputs.OUTPUT2 }}
+    value: ${{ steps.vars.outputs.uuid }}
+  created: 
+    description: ""
+    value: ${{ steps.vars.outputs.CREATED }}
+  branch_name:
+    description: "" 
+    value: ${{ steps.vars.outputs.BRANCH_NAME }}  
 
+  
 runs:
   using: "composite"
  
@@ -25,9 +34,20 @@ runs:
       id: vars
       shell: bash
       run: |
-        echo "OUTPUT1=some_value" >> $GITHUB_OUTPUT
-        echo "#### Output 1 some_value" >> $GITHUB_STEP_SUMMARY
+        echo "CREATED=$(date +'%d%m')" >> $GITHUB_OUTPUT
+        echo "Date Created: $(date +'%d%m')" >> $GITHUB_STEP_SUMMARY
         
-        echo "OUTPUT2=some_other_value" >> $GITHUB_OUTPUT
-        echo "#### Output 2 some_other_value" >> $GITHUB_STEP_SUMMARY
+        echo "EXPIRY=$(date +'%d%m' --date '${{ inputs.expiry }} days')" >> $GITHUB_OUTPUT
+        echo "Expiry Date : $(date +'%d%m' --date '${{ inputs.expiry }} days')" >> $GITHUB_STEP_SUMMARY
         
+        echo "UUID=$(date +'%d%m' --date '${{ inputs.expiry }} days' | xxd -p)" >> $GITHUB_OUTPUT
+        echo "Branch UUID: $(date +'%d%m' --date '${{ inputs.expiry }} days' | xxd -p)" >> $GITHUB_STEP_SUMMARY
+        
+        if [[ "${{ inputs.branch_name }}" == *"main"* ]] ||  [[ "${{ github.ref_name }}" == *"main"* ]]
+        then
+          echo "BRANCH_NAME=%{{ github.actor }}_$(echo ${{ github.repository }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_OUTPUT
+          echo "BRANCH_NAME=%{{ github.actor }}_$(echo ${{ github.repository }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "BRANCH_NAME=$(echo ${{ inputs.branch_name }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_OUTPUT
+          echo "BRANCH_NAME=$(echo ${{ inputs.branch_name }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_STEP_SUMMARY
+        fi
