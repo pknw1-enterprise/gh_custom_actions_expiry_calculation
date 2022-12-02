@@ -9,7 +9,7 @@ inputs:
   expiry:
     description:  ""
     required: true
-    default: 1
+    default: "1"
     
 outputs:
   expiry: 
