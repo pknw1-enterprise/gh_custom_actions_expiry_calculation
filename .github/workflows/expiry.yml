@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: expiry
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+    inputs:
+      expiry:
+
+env:
+  INPUTS: ${{ on.}}
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Expiry
+        id: vars
+        shell: zsh
+        run: |
+          echo "CREATED=$(date +'%d%m')" >> $GITHUB_OUTPUT
+          echo "Date Created: $(date +'%d%m')" >> $GITHUB_STEP_SUMMARY
+
+          echo EXPIRY=$(date +'%d%m' --date ${{ inputs.expiry }} days) >> $GITHUB_OUTPUT
+          echo "Expiry Date : $(date +'%d%m' --date '${{ inputs.expiry }} days')" >> $GITHUB_STEP_SUMMARY
+
+          echo "UUID=$(date +'%d%m' --date '${{ inputs.expiry }} days' | xxd -p)" >> $GITHUB_OUTPUT
+          echo "Branch UUID: $(date +'%d%m' --date '${{ inputs.expiry }} days' | xxd -p)" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ inputs.branch_name }}" == *"main"* ]] ||  [[ "${{ github.ref_name }}" == *"main"* ]]
+          then
+            echo "BRANCH_NAME=%{{ github.actor }}_$(echo ${{ github.repository }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_OUTPUT
+            echo "BRANCH_NAME=%{{ github.actor }}_$(echo ${{ github.repository }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "BRANCH_NAME=$(echo ${{ inputs.branch_name }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_OUTPUT
+            echo "BRANCH_NAME=$(echo ${{ inputs.branch_name }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_STEP_SUMMARY
+          fi
+        
