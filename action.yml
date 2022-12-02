@@ -1,0 +1,33 @@
+name: 'github_action_template'
+description: ''
+author: 'Paul Kelleher'
+inputs:
+  input1:
+    description: ""
+    required: false
+  input2:
+    description:  ""
+    required: false
+    
+outputs:
+  outpu1: 
+    description: ""
+    value: ${{ steps.vars.outputs.OUTPUT1 }}
+  outpu2: 
+    description: ""
+    value: ${{ steps.vars.outputs.OUTPUT2 }}
+
+runs:
+  using: "composite"
+ 
+  steps:
+    - name: Setup Expiry
+      id: vars
+      shell: bash
+      run: |
+        echo "OUTPUT1=some_value" >> $GITHUB_OUTPUT
+        echo "#### Output 1 some_value" >> $GITHUB_STEP_SUMMARY
+        
+        echo "OUTPUT2=some_other_value" >> $GITHUB_OUTPUT
+        echo "#### Output 2 some_other_value" >> $GITHUB_STEP_SUMMARY
+        
