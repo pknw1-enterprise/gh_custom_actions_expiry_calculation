@@ -1,76 +1,16 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_call:
+    inputs:
+      username:
+        description: 'A username passed from the caller workflow'
+        default: 'john-doe'
+        required: false
+        type: string
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  print-username:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-   name: 'action_calaulcate_expiry'
-description: 'takes branch and expiry tijes and returns uniqe branch naem and expiry'
-author: 'Paul Kelleher'
-inputs:
-  branch_name:
-    description: ""
-    required: true
-    default: "main"
-  expiry:
-    description:  ""
-    required: true
-    default: 1
-    
-outputs:
-  expiry: 
-    description: ""
-    value: ${{ steps.vars.outputs.EXPIRY }}
-  uuid: 
-    description: ""
-    value: ${{ steps.vars.outputs.uuid }}
-  created: 
-    description: ""
-    value: ${{ steps.vars.outputs.CREATED }}
-  branch_name:
-    description: "" 
-    value: ${{ steps.vars.outputs.BRANCH_NAME }}  
-
-  
-jobs:
-  test:
-    runs-on: ubuntu-latest
     steps:
-      - name: Setup Expiry
-        id: vars
-        shell: bash
-        run: |
-          echo "CREATED=$(date +'%d%m')" >> $GITHUB_OUTPUT
-          echo "Date Created: $(date +'%d%m')" >> $GITHUB_STEP_SUMMARY
-
-          echo "EXPIRY=$(date +'%d%m' --date '${{ inputs.expiry }} days')" >> $GITHUB_OUTPUT
-          echo "Expiry Date : $(date +'%d%m' --date '${{ inputs.expiry }} days')" >> $GITHUB_STEP_SUMMARY
-
-          echo "UUID=$(date +'%d%m' --date '${{ inputs.expiry }} days' | xxd -p)" >> $GITHUB_OUTPUT
-          echo "Branch UUID: $(date +'%d%m' --date '${{ inputs.expiry }} days' | xxd -p)" >> $GITHUB_STEP_SUMMARY
-
-          if [[ "${{ inputs.branch_name }}" == *"main"* ]] ||  [[ "${{ github.ref_name }}" == *"main"* ]]
-          then
-            echo "BRANCH_NAME=%{{ github.actor }}_$(echo ${{ github.repository }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_OUTPUT
-            echo "BRANCH_NAME=%{{ github.actor }}_$(echo ${{ github.repository }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "BRANCH_NAME=$(echo ${{ inputs.branch_name }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_OUTPUT
-            echo "BRANCH_NAME=$(echo ${{ inputs.branch_name }} | sed 's/\//_/g' | sed 's/\ /_/g')-${{ steps.expiry.outputs.uuid }}" >> $GITHUB_STEP_SUMMARY
-          fi
+      - name: Print the input name to STDOUT
+        run: echo The username is ${ inputs.username }
